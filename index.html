@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Калькулятор дохода в туризме</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#07202A;
+  --ink2:#0E3140;
+  --ink3:#123C4E;
+  --line:rgba(220,237,232,.13);
+  --line-s:rgba(220,237,232,.28);
+  --sea:#DCEDE8;
+  --dim:#8DAFAD;
+  --amber:#FFC247;
+  --coral:#FF6B4A;
+  --ok:#5BD6A8;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--ink);
+  background-image:
+    radial-gradient(1100px 620px at 78% -8%, rgba(255,194,71,.11), transparent 62%),
+    radial-gradient(760px 520px at 4% 104%, rgba(255,107,74,.10), transparent 60%);
+  background-attachment:fixed;
+  color:var(--sea);
+  font-family:'Onest','Segoe UI',system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.5;
+  padding:clamp(16px,4vw,44px) clamp(14px,4vw,28px) 140px;
+  min-height:100vh;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+/* ---------- header ---------- */
+.eyebrow{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:11px;letter-spacing:.19em;text-transform:uppercase;
+  color:var(--amber);display:flex;align-items:center;gap:10px;margin-bottom:18px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line-s)}
+h1{
+  font-family:'Unbounded','Onest',sans-serif;font-weight:800;
+  font-size:clamp(27px,5.6vw,50px);line-height:1.04;letter-spacing:-.022em;
+  max-width:15ch;
+}
+h1 em{font-style:normal;color:var(--amber)}
+.lede{color:var(--dim);max-width:52ch;margin-top:16px;font-size:clamp(14px,2.4vw,16px)}
+
+/* ---------- layout ---------- */
+.grid{display:grid;gap:clamp(20px,3vw,36px);margin-top:clamp(28px,5vw,46px)}
+@media(min-width:940px){.grid{grid-template-columns:1fr 400px;align-items:start}}
+
+/* ---------- board ---------- */
+.board{
+  background:linear-gradient(168deg,var(--ink2),#0A2733);
+  border:1px solid var(--line-s);border-radius:var(--r);
+  padding:26px 22px 22px;position:relative;overflow:hidden;
+}
+.board-col{order:-1}
+@media(min-width:940px){
+  .board-col{position:sticky;top:24px;order:2}
+  .form-col{order:1;min-width:0}
+}
+.board::before{
+  content:"";position:absolute;inset:0 0 auto;height:3px;
+  background:linear-gradient(90deg,var(--amber),var(--coral) 62%,transparent);
+}
+.board-lab{
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--dim);
+}
+.odo{
+  font-family:'Unbounded','Onest',sans-serif;font-weight:800;
+  font-size:clamp(42px,10.5vw,62px);line-height:1;letter-spacing:-.03em;
+  color:var(--amber);display:flex;align-items:baseline;margin:12px 0 4px;
+  text-shadow:0 0 34px rgba(255,194,71,.26);
+}
+@media(min-width:940px){.odo{font-size:54px}}
+.odo .cur{font-size:.55em;margin-right:.09em;opacity:.72;font-weight:600}
+#odo{display:flex}
+.odo-col{display:inline-block;height:1em;overflow:hidden;vertical-align:top}
+.odo-strip{display:flex;flex-direction:column;transition:transform .62s cubic-bezier(.2,.9,.2,1)}
+.odo-d{height:1em;display:block;text-align:center}
+.odo-sep{display:inline-block;width:.24em}
+.byn{color:var(--dim);font-size:15px;font-weight:500}
+.byn b{color:var(--sea);font-weight:600}
+.tiny{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;
+  color:var(--dim);opacity:.75;margin-top:9px;line-height:1.55;
+}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border-radius:11px;overflow:hidden;margin:20px 0 0}
+.stat{background:#0A2A36;padding:13px 10px}
+.stat .v{font-family:'Unbounded',sans-serif;font-weight:600;font-size:19px;letter-spacing:-.02em}
+.stat .k{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--dim);margin-top:4px;line-height:1.35}
+
+.note{
+  margin-top:16px;padding:12px 14px;border-radius:11px;font-size:13.5px;line-height:1.5;
+  background:rgba(255,194,71,.09);border:1px solid rgba(255,194,71,.24);color:#FFDC96;
+}
+.note.good{background:rgba(91,214,168,.09);border-color:rgba(91,214,168,.26);color:#A9EDD3}
+.note b{font-weight:600}
+
+.bar{margin-top:18px}
+.bar-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim);margin-bottom:6px}
+.bar-row span:last-child{color:var(--sea);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:12px}
+.track{height:7px;border-radius:4px;background:rgba(220,237,232,.11);overflow:hidden;margin-bottom:13px}
+.fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.2,.9,.2,1)}
+.fill.you{background:linear-gradient(90deg,var(--amber),var(--coral))}
+.fill.avg{background:rgba(220,237,232,.3)}
+
+.cta{
+  display:block;margin-top:20px;text-align:center;text-decoration:none;
+  background:var(--coral);color:#0A2029;font-weight:700;font-size:15px;
+  padding:15px;border-radius:11px;transition:transform .15s,filter .15s;
+}
+.cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+/* ---------- form ---------- */
+.sec{border-top:1px solid var(--line);padding:26px 0 4px}
+.sec:first-child{border-top:0;padding-top:0}
+.sec-h{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.sec-h h2{
+  font-family:'Onest',sans-serif;font-weight:600;font-size:17px;letter-spacing:-.01em;flex:1;
+}
+.q{
+  flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line-s);
+  background:transparent;color:var(--dim);font-family:'JetBrains Mono',monospace;
+  font-size:12px;cursor:pointer;transition:.16s;line-height:1;
+}
+.q:hover,.q[aria-expanded="true"]{background:var(--amber);color:var(--ink);border-color:var(--amber)}
+.help{
+  display:none;font-size:13.5px;line-height:1.6;color:var(--dim);
+  border-left:2px solid var(--amber);padding:2px 0 2px 14px;margin:-6px 0 18px;
+}
+.help.on{display:block}
+.help b{color:var(--sea);font-weight:600}
+
+/* sliders */
+.sl+.sl{margin-top:20px}
+.sl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.sl-top .l{font-size:14.5px;color:var(--dim)}
+.sl-top .v{font-family:'Unbounded',sans-serif;font-weight:600;font-size:17px;color:var(--amber)}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;display:block;
+}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:rgba(220,237,232,.15)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--amber);
+  border:4px solid var(--ink);margin-top:-8.5px;box-shadow:0 0 0 1px var(--amber);
+}
+input[type=range]::-moz-range-track{height:5px;border-radius:3px;background:rgba(220,237,232,.15)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--amber);
+  border:4px solid var(--ink);box-shadow:0 0 0 1px var(--amber)}
+input[type=range]:focus-visible{outline:2px solid var(--coral);outline-offset:4px;border-radius:4px}
+.scale{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--dim);opacity:.6;margin-top:2px}
+
+/* option cards */
+.opts{display:grid;gap:9px}
+.opts.two{grid-template-columns:1fr 1fr}
+@media(max-width:480px){.opts.two{grid-template-columns:1fr}}
+.opt{position:relative;display:block;cursor:pointer}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.opt .card{
+  border:1px solid var(--line-s);border-radius:12px;padding:13px 15px;
+  background:rgba(220,237,232,.028);transition:.16s;height:100%;
+  display:flex;align-items:center;gap:12px;
+}
+.opt .card:hover{background:rgba(220,237,232,.06)}
+.opt input:checked+.card{border-color:var(--amber);background:rgba(255,194,71,.10)}
+.opt input:focus-visible+.card{outline:2px solid var(--coral);outline-offset:2px}
+.opt .body{flex:1;min-width:0}
+.opt .t{display:block;font-size:14.5px;font-weight:500;line-height:1.3}
+.opt .d{display:block;font-size:12.5px;color:var(--dim);margin-top:3px;line-height:1.4}
+.opt .pr{
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+  color:var(--amber);white-space:nowrap;flex:none;
+}
+.opt input:checked+.card .pr{color:var(--amber)}
+.opt.disabled{opacity:.34;pointer-events:none}
+
+/* sticky mobile bar */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:rgba(8,35,45,.93);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line-s);
+  padding:11px clamp(14px,4vw,28px) calc(11px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:14px;
+  transform:translateY(110%);transition:transform .3s;
+}
+.dock.on{transform:none}
+@media(min-width:940px){.dock{display:none}}
+.dock .k{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+.dock .v{font-family:'Unbounded',sans-serif;font-weight:700;font-size:23px;color:var(--amber);line-height:1.1}
+.dock a{margin-left:auto;background:var(--coral);color:#0A2029;text-decoration:none;
+  font-weight:700;font-size:13.5px;padding:11px 17px;border-radius:9px;white-space:nowrap}
+
+footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);
+  font-size:12px;line-height:1.65;color:var(--dim);opacity:.72;max-width:70ch}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Расчёт дохода · туризм · Беларусь</div>
+  <h1>Сколько вы заработаете <em>за месяц</em> в туризме</h1>
+  <p class="lede">Выставьте параметры под себя — сколько готовы работать, что продавать и откуда брать клиентов. Считаем чистыми: налоги и расходы уже вычтены.</p>
+
+  <div class="grid">
+
+    <!-- ============ ФОРМА ============ -->
+    <div class="form-col">
+
+      <!-- 1. ВРЕМЯ -->
+      <section class="sec">
+        <div class="sec-h">
+          <h2>Сколько готовы работать</h2>
+          <button class="q" aria-expanded="false" data-help="h1">?</button>
+        </div>
+        <div class="help" id="h1">
+          В туризме нет графика с 9 до 18. Одна продажа — это <b>подбор тура, переписка, бронирование и сопровождение до вылета</b>. В среднем на одну оплаченную заявку уходит 4–6 часов, включая время на тех, кто написал и не купил. Ставьте честно: столько, сколько реально сможете отдавать работе.
+        </div>
+        <div class="sl">
+          <div class="sl-top"><span class="l">Часов в день</span><span class="v" id="vHours">5</span></div>
+          <input type="range" id="hours" min="1" max="10" step="1" value="5">
+          <div class="scale"><span>1</span><span>10</span></div>
+        </div>
+        <div class="sl">
+          <div class="sl-top"><span class="l">Дней в месяц</span><span class="v" id="vDays">15</span></div>
+          <input type="range" id="days" min="4" max="26" step="1" value="15">
+          <div class="scale"><span>4</span><span>26</span></div>
+        </div>
+      </section>
+
+      <!-- 2. УРОВЕНЬ -->
+      <section class="sec">
+        <div class="sec-h">
+          <h2>Ваш уровень</h2>
+          <button class="q" aria-expanded="false" data-help="h2">?</button>
+        </div>
+        <div class="help" id="h2">
+          Уровень влияет на две вещи. <b>Конверсия</b> — сколько из обратившихся реально покупают: у новичка это 6–7 человек из ста, у агента со скриптами и отзывами — 10, у опытного с базой постоянных клиентов — 14 и выше. И <b>размер комиссии</b>: туроператор повышает процент тем, кто даёт объём. Новичок стартует с нижней ступени, через полгода-год переходит на повышенную.
+        </div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="lvl" value="new"><span class="card"><span class="body"><span class="t">Только начинаю</span><span class="d">Первые месяцы, клиентской базы нет</span></span></span></label>
+          <label class="opt"><input type="radio" name="lvl" value="mid" checked><span class="card"><span class="body"><span class="t">Работаю системно</span><span class="d">Есть обучение, скрипты и первые отзывы</span></span></span></label>
+          <label class="opt"><input type="radio" name="lvl" value="pro"><span class="card"><span class="body"><span class="t">Опыт больше года</span><span class="d">Постоянные клиенты, повышенная комиссия</span></span></span></label>
+        </div>
+      </section>
+
+      <!-- 3. НАПРАВЛЕНИЯ -->
+      <section class="sec">
+        <div class="sec-h">
+          <h2>Что вы продаёте</h2>
+          <button class="q" aria-expanded="false" data-help="h3">?</button>
+        </div>
+        <div class="help" id="h3">
+          Сил на дешёвый и дорогой тур уходит примерно поровну, а комиссия считается в процентах от стоимости. Поэтому <b>средний чек — самый сильный рычаг в этой профессии</b>. Дорогие направления дают ещё и повышенный процент: за массовую Турцию оператор платит меньше, чем за Мальдивы. Если пока не решили — берите смешанный портфель, так работает большинство агентов.
+        </div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="dir" value="0"><span class="card"><span class="body"><span class="t">Египет, Турция — эконом</span><span class="d">Двое взрослых, 7 ночей</span></span><span class="pr">$1 150</span></span></label>
+          <label class="opt"><input type="radio" name="dir" value="1"><span class="card"><span class="body"><span class="t">Турция «всё включено»</span><span class="d">Семья 2+1, 10 ночей, 5★</span></span><span class="pr">$2 300</span></span></label>
+          <label class="opt"><input type="radio" name="dir" value="2"><span class="card"><span class="body"><span class="t">ОАЭ, Египет — премиум-отели</span><span class="d">Двое, высокая категория</span></span><span class="pr">$3 100</span></span></label>
+          <label class="opt"><input type="radio" name="dir" value="3"><span class="card"><span class="body"><span class="t">Таиланд, Вьетнам, Шри-Ланка</span><span class="d">Двое, 11–14 ночей, зимний сезон</span></span><span class="pr">$3 600</span></span></label>
+          <label class="opt"><input type="radio" name="dir" value="4"><span class="card"><span class="body"><span class="t">Мальдивы, Сейшелы, круизы</span><span class="d">Люкс-сегмент, свадебные путешествия</span></span><span class="pr">$6 500</span></span></label>
+          <label class="opt"><input type="radio" name="dir" value="5" checked><span class="card"><span class="body"><span class="t">Смешанный портфель</span><span class="d">Массовые направления плюс экзотика</span></span><span class="pr">$2 000</span></span></label>
+        </div>
+      </section>
+
+      <!-- 4. КЛИЕНТЫ -->
+      <section class="sec">
+        <div class="sec-h">
+          <h2>Откуда клиенты</h2>
+          <button class="q" aria-expanded="false" data-help="h4">?</button>
+        </div>
+        <div class="help" id="h4">
+          Здесь чаще всего и упирается доход. Можно быть готовым работать по 8 часов, но если в месяц пишут 20 человек — больше двух туров вы не продадите. <b>В агентстве</b> поток заявок дают вам, но делятся только частью комиссии и удерживают налоги как с зарплаты. <b>Свой блог и сарафан</b> — заявки бесплатные, но их количество ограничено вашей аудиторией. <b>Реклама</b> снимает потолок по количеству, но каждая заявка стоит денег — это уже учтено в расчёте.
+        </div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="src" value="agency"><span class="card"><span class="body"><span class="t">Работа в агентстве</span><span class="d">Оклад плюс процент, заявки от агентства, налоги удерживает наниматель</span></span></span></label>
+          <label class="opt"><input type="radio" name="src" value="blog" checked><span class="card"><span class="body"><span class="t">Свой блог и сарафан</span><span class="d">Работаете на себя, заявки бесплатные, но их немного</span></span></span></label>
+          <label class="opt"><input type="radio" name="src" value="ads"><span class="card"><span class="body"><span class="t">Платная реклама</span><span class="d">Заявок столько, сколько нужно — упираетесь только во время</span></span></span></label>
+          <label class="opt"><input type="radio" name="src" value="mix"><span class="card"><span class="body"><span class="t">Блог плюс реклама</span><span class="d">Бесплатные заявки из блога, остальное добираете рекламой</span></span></span></label>
+        </div>
+      </section>
+
+      <!-- 5. ПОМОЩНИК -->
+      <section class="sec">
+        <div class="sec-h">
+          <h2>Помощник</h2>
+          <button class="q" aria-expanded="false" data-help="h5">?</button>
+        </div>
+        <div class="help" id="h5">
+          После брони начинается рутина: документы, страховки, ваучеры, напоминания, вопросы клиента до самого вылета. Это <b>примерно час на каждой сделке</b>, и он не требует ваших навыков продаж. Помощник забирает эту часть — вы теряете часть комиссии, но освободившееся время тратите на новые продажи. Итог: денег в месяц чуть меньше, а <b>доход за час — выше</b>. В агентстве сопровождением занимается офис, поэтому выбор недоступен.
+        </div>
+        <div class="opts two">
+          <label class="opt" id="oNoAsst"><input type="radio" name="asst" value="0" checked><span class="card"><span class="body"><span class="t">Работаю один</span></span></span></label>
+          <label class="opt" id="oAsst"><input type="radio" name="asst" value="1"><span class="card"><span class="body"><span class="t">Есть помощник</span></span></span></label>
+        </div>
+      </section>
+
+      <footer>
+        Расчёт учитывает налоги Республики Беларусь 2026 года: подоходный налог, взносы в ФСЗН, а для наёмной работы — удержания нанимателя. Из дохода также вычтены расходы на рекламу, оплату помощника и рабочие сервисы. Курс: 1 $ = 2,90 руб. Цифры ориентировочные и зависят от сезона, направления и условий конкретного туроператора.
+      </footer>
+    </div>
+
+    <!-- ============ ТАБЛО ============ -->
+    <div class="board-col">
+      <div class="board">
+        <div class="board-lab">Чистыми в месяц</div>
+        <div class="odo"><span class="cur">$</span><span id="odo"></span></div>
+        <div class="byn">≈ <b id="byn">0</b> бел. руб. на руки</div>
+        <div class="tiny" id="fmt">—</div>
+
+        <div class="stats">
+          <div class="stat"><div class="v" id="sSales">0</div><div class="k">туров<br>в месяц</div></div>
+          <div class="stat"><div class="v" id="sWeek">0</div><div class="k">часов<br>в неделю</div></div>
+          <div class="stat"><div class="v" id="sHour">$0</div><div class="k">доход<br>за час</div></div>
+        </div>
+
+        <div class="note" id="note"></div>
+
+        <div class="bar">
+          <div class="bar-row"><span>Вы в туризме</span><span id="bYou">0 р.</span></div>
+          <div class="track"><div class="fill you" id="fYou" style="width:0%"></div></div>
+          <div class="bar-row"><span>Средняя зарплата по стране</span><span id="bAvg">2 670 р.</span></div>
+          <div class="track"><div class="fill avg" id="fAvg" style="width:50%"></div></div>
+        </div>
+
+        <a class="cta" href="#" id="ctaMain">Как выйти на этот доход →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="dock" id="dock">
+  <div><div class="k">Чистыми в месяц</div><div class="v" id="dockV">$0</div></div>
+  <a href="#" id="ctaDock">Обучение</a>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- КОНСТАНТЫ (скрыты от пользователя) ---------- */
+var RATE      = 2.90;      // BYN за 1 USD
+var FSZN_M    = 300.30;    // взнос ИП в ФСЗН, руб/мес (35% от МЗП 858)
+var TAX_IP    = 0.20;      // подоходный налог ИП, общая система
+var TAX_EMP   = 0.14;      // наёмный: 13% подоходный + 1% ФСЗН
+var AVG_NET   = 3104 * 0.86; // средняя зарплата по стране на руки, руб
+var OKLAD     = 700;       // оклад менеджера в агентстве, руб/мес (полная занятость)
+var AGENT_CUT = 0.25;      // доля менеджера от комиссии агентства
+var CPL       = 5;         // стоимость заявки из рекламы, $
+var ASSIST    = 15;        // оплата помощника за сделку, $
+var SERVICES  = 25;        // поисковик туров, CRM, связь, $/мес
+
+/* dem — ёмкость спроса на направление: люкс покупают редко, Турцию — постоянно */
+var DIRS = [
+  {chk:1150, com:0.080, dem:1.30},
+  {chk:2300, com:0.090, dem:1.00},
+  {chk:3100, com:0.100, dem:0.45},
+  {chk:3600, com:0.110, dem:0.35},
+  {chk:6500, com:0.120, dem:0.18},
+  {chk:2000, com:0.095, dem:1.00}
+];
+var LVL = {
+  "new":{conv:0.07, comK:0.85, blog:40},
+  "mid":{conv:0.10, comK:1.00, blog:80},
+  "pro":{conv:0.14, comK:1.20, blog:140}
+};
+
+/* ---------- ОДОМЕТР ---------- */
+var odoBox = document.getElementById('odo'), cols = [], lastLen = -1;
+function odometer(n){
+  var s = String(Math.max(0, Math.round(n)));
+  if(s.length !== lastLen){
+    lastLen = s.length; odoBox.innerHTML = ''; cols = [];
+    for(var i=0;i<s.length;i++){
+      if(i>0 && (s.length-i)%3===0){
+        var sep=document.createElement('span'); sep.className='odo-sep'; odoBox.appendChild(sep);
+      }
+      var col=document.createElement('span'); col.className='odo-col';
+      var strip=document.createElement('span'); strip.className='odo-strip';
+      for(var d=0;d<=9;d++){ var q=document.createElement('span'); q.className='odo-d'; q.textContent=d; strip.appendChild(q); }
+      col.appendChild(strip); odoBox.appendChild(col); cols.push(strip);
+    }
+  }
+  for(var j=0;j<cols.length;j++){
+    cols[j].style.transitionDelay = (j*45)+'ms';
+    cols[j].style.transform = 'translateY(-'+(+s[j]*10)+'%)';
+  }
+}
+function fmt(n){ return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
+
+/* ---------- РАСЧЁТ ---------- */
+function calc(){
+  var hours = +document.getElementById('hours').value;
+  var days  = +document.getElementById('days').value;
+  var lvl   = LVL[document.querySelector('[name=lvl]:checked').value];
+  var dir   = DIRS[+document.querySelector('[name=dir]:checked').value];
+  var src   = document.querySelector('[name=src]:checked').value;
+  var isAgency = (src === 'agency');
+  var asst  = !isAgency && document.querySelector('[name=asst]:checked').value === '1';
+
+  document.getElementById('oAsst').classList.toggle('disabled', isAgency);
+  document.getElementById('oNoAsst').classList.toggle('disabled', isAgency);
+
+  var conv = lvl.conv;
+  var comm = Math.min(0.14, dir.com * lvl.comK);
+
+  /* время на одну продажу */
+  var tLead = isAgency ? 0.30 : 0.35;          // обработка заявки
+  var tDeal = 0.5;                              // бронирование и оформление
+  var tSupp = (isAgency || asst) ? 0 : 1.0;     // сопровождение до вылета
+  var hPerSale = tLead / conv + tDeal + tSupp;
+
+  /* потолок по заявкам */
+  var rawCap;
+  if(isAgency)          rawCap = 90;
+  else if(src==='blog') rawCap = lvl.blog;
+  else if(src==='ads')  rawCap = 260;
+  else                  rawCap = lvl.blog + 220;
+  var leadCap = rawCap * dir.dem;
+
+  var timeCap  = (hours * days) / hPerSale;
+  var leadSale = leadCap * conv;
+  var sales    = Math.floor(Math.min(timeCap, leadSale));
+  if(sales < 0) sales = 0;
+
+  var leadsUsed = sales / conv;
+  var freeLeads = (src==='blog' || src==='mix') ? lvl.blog * dir.dem : (isAgency ? leadsUsed : 0);
+  var paidLeads = isAgency ? 0 : Math.max(0, leadsUsed - freeLeads);
+
+  var hoursActual = sales * hPerSale;
+  var net;
+
+  if(isAgency){
+    var load  = Math.min(1, (hours*days)/168);
+    var gross = OKLAD/RATE * load + sales * dir.chk * comm * AGENT_CUT;
+    net = gross * (1 - TAX_EMP);
+  } else {
+    var grossC = sales * dir.chk * comm;
+    var costs  = paidLeads * CPL + (asst ? sales * ASSIST : 0) + SERVICES + FSZN_M/RATE;
+    var base   = Math.max(0, grossC - costs);
+    net = grossC - costs - base * TAX_IP;
+    if(net < 0) net = 0;
+  }
+
+  /* ---------- ВЫВОД ---------- */
+  odometer(net);
+  document.getElementById('byn').textContent = fmt(net * RATE);
+  document.getElementById('sSales').textContent = sales;
+  document.getElementById('sWeek').textContent = (hoursActual/4.3).toFixed(hoursActual/4.3 < 10 ? 1 : 0);
+  document.getElementById('sHour').textContent = hoursActual > 0 ? '$' + Math.round(net/hoursActual) : '—';
+  document.getElementById('dockV').textContent = '$' + fmt(net);
+
+  document.getElementById('fmt').textContent =
+    isAgency ? 'Наёмная работа · удержано 13% подоходного и 1% в ФСЗН'
+             : 'ИП · подоходный налог 20%, взносы в ФСЗН и рабочие расходы вычтены';
+
+  /* узкое место */
+  var note = document.getElementById('note'), possible = Math.floor(timeCap);
+  note.className = 'note';
+  if(sales === 0){
+    note.innerHTML = 'При таких настройках не набирается ни одной продажи. Добавьте часов или расширьте источник заявок.';
+  } else if(leadSale < timeCap - 0.5){
+    note.innerHTML = '<b>Упираетесь в поток заявок.</b> Времени хватило бы на ' + possible +
+      ' туров, но обращений приходит только на ' + sales + '. Свободно ' +
+      Math.round(hours*days - hoursActual) + ' ч в месяц.';
+  } else {
+    note.className = 'note good';
+    note.innerHTML = '<b>Заявок хватает, упираетесь во время.</b> Каждый дополнительный час — это примерно $' +
+      Math.round(net/Math.max(1,hoursActual)) + ' сверху.';
+  }
+
+  /* сравнение */
+  var youB = net * RATE, max = Math.max(youB, AVG_NET, 1);
+  document.getElementById('bYou').textContent = fmt(youB) + ' р.';
+  document.getElementById('bAvg').textContent = fmt(AVG_NET) + ' р.';
+  document.getElementById('fYou').style.width = (youB/max*100) + '%';
+  document.getElementById('fAvg').style.width = (AVG_NET/max*100) + '%';
+
+  document.getElementById('vHours').textContent = hours;
+  document.getElementById('vDays').textContent  = days;
+}
+
+/* ---------- СОБЫТИЯ ---------- */
+document.querySelectorAll('input').forEach(function(el){
+  el.addEventListener('input', calc);
+  el.addEventListener('change', calc);
+});
+document.querySelectorAll('.q').forEach(function(b){
+  b.addEventListener('click', function(){
+    var t = document.getElementById(b.dataset.help);
+    var on = t.classList.toggle('on');
+    b.setAttribute('aria-expanded', on);
+  });
+});
+
+/* док-бар появляется, когда табло ушло за экран */
+var board = document.querySelector('.board'), dock = document.getElementById('dock');
+if('IntersectionObserver' in window){
+  new IntersectionObserver(function(e){
+    dock.classList.toggle('on', !e[0].isIntersecting && window.innerWidth < 940);
+  },{threshold:0.15}).observe(board);
+}
+
+calc();
+})();
+</script>
+</body>
+</html>
