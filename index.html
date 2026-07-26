@@ -95,7 +95,7 @@ h1 em{font-style:normal;color:var(--amber)}
   color:var(--dim);opacity:.75;margin-top:9px;line-height:1.55;
 }
 
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);
   border-radius:11px;overflow:hidden;margin:20px 0 0}
 .stat{background:#0A2A36;padding:13px 10px}
 .stat .v{font-family:'Unbounded',sans-serif;font-weight:600;font-size:19px;letter-spacing:-.02em}
@@ -161,6 +161,8 @@ input[type=range]::-moz-range-track{height:5px;border-radius:3px;background:rgba
 input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--amber);
   border:4px solid var(--ink);box-shadow:0 0 0 1px var(--amber)}
 input[type=range]:focus-visible{outline:2px solid var(--coral);outline-offset:4px;border-radius:4px}
+.hint{font-size:12.5px;line-height:1.45;color:var(--dim);margin-top:9px}
+.hint b{color:var(--amber);font-weight:600}
 .scale{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;
   font-size:10px;color:var(--dim);opacity:.6;margin-top:2px}
 
@@ -239,8 +241,8 @@ footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);
         </div>
         <div class="sl">
           <div class="sl-top"><span class="l">Дней в месяц</span><span class="v" id="vDays">15</span></div>
-          <input type="range" id="days" min="4" max="26" step="1" value="15">
-          <div class="scale"><span>4</span><span>26</span></div>
+          <input type="range" id="days" min="5" max="26" step="1" value="15">
+          <div class="scale"><span>5</span><span>26</span></div>
         </div>
       </section>
 
@@ -282,18 +284,20 @@ footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);
       <!-- 4. КЛИЕНТЫ -->
       <section class="sec">
         <div class="sec-h">
-          <h2>Откуда клиенты</h2>
+          <h2>Как вы работаете</h2>
           <button class="q" aria-expanded="false" data-help="h4">?</button>
         </div>
         <div class="help" id="h4">
-          Здесь чаще всего и упирается доход. Можно быть готовым работать по 8 часов, но если в месяц пишут 20 человек — больше двух туров вы не продадите. <b>В агентстве</b> поток заявок дают вам, но делятся только частью комиссии и удерживают налоги как с зарплаты. <b>Свой блог и сарафан</b> — заявки бесплатные, но их количество ограничено вашей аудиторией. <b>Реклама</b> снимает потолок по количеству, но каждая заявка стоит денег — это уже учтено в расчёте.
+<b>В агентстве</b> вам передают готовых клиентов и платят оклад, но бóльшую часть комиссии агентство оставляет себе. <b>На себя</b> — комиссия ваша целиком, но клиентов вы находите сами: через блог и рекомендации бесплатно либо через рекламу за деньги. Стоимость рекламы в расчёте уже вычтена.<br><br>Под цифрой дохода калькулятор показывает, <b>сколько обращений нужно набрать</b> — это и есть главная рабочая задача турагента.
         </div>
         <div class="opts">
           <label class="opt"><input type="radio" name="src" value="agency"><span class="card"><span class="body"><span class="t">Работа в агентстве</span><span class="d">Оклад плюс процент, заявки от агентства, налоги удерживает наниматель</span></span></span></label>
-          <label class="opt"><input type="radio" name="src" value="blog" checked><span class="card"><span class="body"><span class="t">Свой блог и сарафан</span><span class="d">Работаете на себя, заявки бесплатные, но их немного</span></span></span></label>
-          <label class="opt"><input type="radio" name="src" value="ads"><span class="card"><span class="body"><span class="t">Платная реклама</span><span class="d">Заявок столько, сколько нужно — упираетесь только во время</span></span></span></label>
-          <label class="opt"><input type="radio" name="src" value="mix"><span class="card"><span class="body"><span class="t">Блог плюс реклама</span><span class="d">Бесплатные заявки из блога, остальное добираете рекламой</span></span></span></label>
+          <label class="opt"><input type="radio" name="src" value="blog" checked><span class="card"><span class="body"><span class="t">На себя, клиенты из блога</span><span class="d">Вся комиссия ваша, на привлечение денег не тратите</span></span></span></label>
+          <label class="opt"><input type="radio" name="src" value="ads"><span class="card"><span class="body"><span class="t">На себя, с платной рекламой</span><span class="d">Вся комиссия ваша, привлечение клиентов — за деньги</span></span></span></label>
+          <label class="opt"><input type="radio" name="src" value="mix"><span class="card"><span class="body"><span class="t">На себя, блог плюс реклама</span><span class="d">Часть клиентов приходит сама, часть — из рекламы</span></span></span></label>
         </div>
+
+        <div class="hint" id="hLeads" style="margin-top:18px"></div>
       </section>
 
       <!-- 5. ПОМОЩНИК -->
@@ -328,6 +332,7 @@ footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);
           <div class="stat"><div class="v" id="sSales">0</div><div class="k">туров<br>в месяц</div></div>
           <div class="stat"><div class="v" id="sWeek">0</div><div class="k">часов<br>в неделю</div></div>
           <div class="stat"><div class="v" id="sHour">$0</div><div class="k">доход<br>за час</div></div>
+          <div class="stat"><div class="v" id="sLeads">0</div><div class="k">нужно<br>обращений</div></div>
         </div>
 
         <div class="note" id="note"></div>
@@ -367,19 +372,19 @@ var CPL       = 5;         // стоимость заявки из реклам�
 var ASSIST    = 15;        // оплата помощника за сделку, $
 var SERVICES  = 25;        // поисковик туров, CRM, связь, $/мес
 
-/* dem — ёмкость спроса на направление: люкс покупают редко, Турцию — постоянно */
+/* tm — множитель времени: люкс продаётся дольше, эконом быстрее */
 var DIRS = [
-  {chk:1150, com:0.080, dem:1.30},
-  {chk:2300, com:0.090, dem:1.00},
-  {chk:3100, com:0.100, dem:0.45},
-  {chk:3600, com:0.110, dem:0.35},
-  {chk:6500, com:0.120, dem:0.18},
-  {chk:2000, com:0.095, dem:1.00}
+  {chk:1150, com:0.080, tm:0.85},
+  {chk:2300, com:0.090, tm:1.00},
+  {chk:3100, com:0.100, tm:1.25},
+  {chk:3600, com:0.110, tm:1.45},
+  {chk:6500, com:0.090, tm:2.30},
+  {chk:2000, com:0.095, tm:1.00}
 ];
 var LVL = {
-  "new":{conv:0.07, comK:0.85, blog:40},
-  "mid":{conv:0.10, comK:1.00, blog:80},
-  "pro":{conv:0.14, comK:1.20, blog:140}
+  "new":{conv:0.08, comK:0.90},
+  "mid":{conv:0.10, comK:1.00},
+  "pro":{conv:0.14, comK:1.20}
 };
 
 /* ---------- ОДОМЕТР ---------- */
@@ -421,69 +426,76 @@ function calc(){
   var conv = lvl.conv;
   var comm = Math.min(0.14, dir.com * lvl.comK);
 
-  /* время на одну продажу */
-  var tLead = isAgency ? 0.30 : 0.35;          // обработка заявки
-  var tDeal = 0.5;                              // бронирование и оформление
-  var tSupp = (isAgency || asst) ? 0 : 1.0;     // сопровождение до вылета
-  var hPerSale = tLead / conv + tDeal + tSupp;
+  /* сколько часов уходит на одну оплаченную продажу */
+  var tLead = isAgency ? 0.30 : 0.35;
+  var tDeal = 0.5;
+  var tSupp = (isAgency || asst) ? 0 : 1.0;
+  var hPerSale = (tLead / conv + tDeal + tSupp) * dir.tm;
 
-  /* потолок по заявкам */
-  var rawCap;
-  if(isAgency)          rawCap = 90;
-  else if(src==='blog') rawCap = lvl.blog;
-  else if(src==='ads')  rawCap = 260;
-  else                  rawCap = lvl.blog + 220;
-  var leadCap = rawCap * dir.dem;
+  var budget  = hours * days;
+  var maxLoad = Math.max(4, Math.round((asst ? 28 : 20) / dir.tm));
+  var byTime  = Math.floor(budget / hPerSale);
+  var sales   = Math.max(0, Math.min(byTime, maxLoad));
+  var capped  = byTime > maxLoad;
+  var leadsNeeded = Math.round(sales / conv);
 
-  var timeCap  = (hours * days) / hPerSale;
-  var leadSale = leadCap * conv;
-  var sales    = Math.floor(Math.min(timeCap, leadSale));
-  if(sales < 0) sales = 0;
-
-  var leadsUsed = sales / conv;
-  var freeLeads = (src==='blog' || src==='mix') ? lvl.blog * dir.dem : (isAgency ? leadsUsed : 0);
-  var paidLeads = isAgency ? 0 : Math.max(0, leadsUsed - freeLeads);
+  /* платные обращения по формату работы */
+  var paidLeads = src === 'ads' ? leadsNeeded
+                : src === 'mix' ? leadsNeeded * 0.55
+                : 0;
 
   var hoursActual = sales * hPerSale;
   var net;
 
   if(isAgency){
-    var load  = Math.min(1, (hours*days)/168);
+    var load  = Math.min(1, budget/168);
     var gross = OKLAD/RATE * load + sales * dir.chk * comm * AGENT_CUT;
     net = gross * (1 - TAX_EMP);
   } else {
     var grossC = sales * dir.chk * comm;
     var costs  = paidLeads * CPL + (asst ? sales * ASSIST : 0) + SERVICES + FSZN_M/RATE;
     var base   = Math.max(0, grossC - costs);
-    net = grossC - costs - base * TAX_IP;
-    if(net < 0) net = 0;
+    net = Math.max(0, grossC - costs - base * TAX_IP);
   }
 
   /* ---------- ВЫВОД ---------- */
   odometer(net);
-  document.getElementById('byn').textContent = fmt(net * RATE);
+  document.getElementById('byn').textContent  = fmt(net * RATE);
   document.getElementById('sSales').textContent = sales;
-  document.getElementById('sWeek').textContent = (hoursActual/4.3).toFixed(hoursActual/4.3 < 10 ? 1 : 0);
-  document.getElementById('sHour').textContent = hoursActual > 0 ? '$' + Math.round(net/hoursActual) : '—';
-  document.getElementById('dockV').textContent = '$' + fmt(net);
+  document.getElementById('sWeek').textContent  = (hoursActual/4.3).toFixed(hoursActual/4.3 < 10 ? 1 : 0);
+  document.getElementById('sHour').textContent  = hoursActual > 0 ? '$' + Math.round(net/hoursActual) : '—';
+  document.getElementById('sLeads').textContent = leadsNeeded;
 
+  document.getElementById('dockV').textContent = '$' + fmt(net);
   document.getElementById('fmt').textContent =
     isAgency ? 'Наёмная работа · удержано 13% подоходного и 1% в ФСЗН'
              : 'ИП · подоходный налог 20%, взносы в ФСЗН и рабочие расходы вычтены';
 
-  /* узкое место */
-  var note = document.getElementById('note'), possible = Math.floor(timeCap);
-  note.className = 'note';
+  var srcHint = {
+    agency:'Клиентов передаёт агентство, но бóльшую часть комиссии оно оставляет себе.',
+    blog:'Клиенты приходят из блога и по рекомендациям — привлечение вам ничего не стоит.',
+    ads:'Клиенты приходят с рекламы, её стоимость уже вычтена из результата.',
+    mix:'Часть клиентов приходит сама, часть — с рекламы, её стоимость уже вычтена.'
+  };
+  document.getElementById('hLeads').textContent = srcHint[src];
+
+  /* задача по клиентам, а не ограничение */
+  var perDay = days > 0 ? (leadsNeeded/days) : 0;
+  var note = document.getElementById('note');
+  note.className = 'note good';
   if(sales === 0){
-    note.innerHTML = 'При таких настройках не набирается ни одной продажи. Добавьте часов или расширьте источник заявок.';
-  } else if(leadSale < timeCap - 0.5){
-    note.innerHTML = '<b>Упираетесь в поток заявок.</b> Времени хватило бы на ' + possible +
-      ' туров, но обращений приходит только на ' + sales + '. Свободно ' +
-      Math.round(hours*days - hoursActual) + ' ч в месяц.';
+    note.className = 'note';
+    note.innerHTML = 'Такого графика не хватает даже на один тур. Добавьте часов или дней.';
+  } else if(capped){
+    note.innerHTML = '<b>Вы упёрлись в потолок по количеству.</b> Больше ' + maxLoad +
+      ' сделок в месяц один агент вести не успевает. Дальше доход растёт не часами, ' +
+      'а средним чеком — выберите направление дороже и посмотрите, что будет.';
   } else {
-    note.className = 'note good';
-    note.innerHTML = '<b>Заявок хватает, упираетесь во время.</b> Каждый дополнительный час — это примерно $' +
-      Math.round(net/Math.max(1,hoursActual)) + ' сверху.';
+    note.innerHTML = '<b>Что для этого нужно:</b> около ' + leadsNeeded + ' ' +
+      plural(leadsNeeded,'обращения','обращений','обращений') + ' в месяц, это ' +
+      (perDay < 2 ? perDay.toFixed(1) : Math.round(perDay)) + ' ' +
+      plural(Math.round(perDay),'человек','человека','человек') + ' в день. ' +
+      'Покупает примерно каждый ' + Math.round(1/conv) + '-й.';
   }
 
   /* сравнение */
@@ -495,6 +507,13 @@ function calc(){
 
   document.getElementById('vHours').textContent = hours;
   document.getElementById('vDays').textContent  = days;
+}
+
+function plural(n,a,b,c){
+  var n10 = n % 10, n100 = n % 100;
+  if(n10 === 1 && n100 !== 11) return a;
+  if(n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return b;
+  return c;
 }
 
 /* ---------- СОБЫТИЯ ---------- */
