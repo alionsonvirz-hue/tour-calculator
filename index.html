@@ -271,23 +271,7 @@ footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);
         </div>
       </section>
 
-      <!-- 2. ОПЫТ -->
-      <section class="sec">
-        <div class="sec-h">
-          <h2>Ваш опыт</h2>
-          <button class="q" aria-expanded="false" data-help="h2">?</button>
-        </div>
-        <div class="help" id="h2">
-          От опыта зависят две вещи. <b>Сколько людей доходят до покупки</b>: у новичка покупает примерно каждый двенадцатый из написавших, у опытного — каждый седьмой. И <b>какой процент платит туроператор</b>: новичкам меньше, тем, кто продаёт много, — больше.
-        </div>
-        <div class="opts">
-          <label class="opt"><input type="radio" name="lvl" value="new"><span class="card"><span class="body"><span class="t">Только начинаю</span><span class="d">Ещё учусь, клиентов пока нет</span></span></span></label>
-          <label class="opt"><input type="radio" name="lvl" value="mid" checked><span class="card"><span class="body"><span class="t">Уже продаю</span><span class="d">Прошёл обучение, есть первые клиенты</span></span></span></label>
-          <label class="opt"><input type="radio" name="lvl" value="pro"><span class="card"><span class="body"><span class="t">Работаю больше года</span><span class="d">Есть постоянные клиенты, которые возвращаются</span></span></span></label>
-        </div>
-      </section>
-
-      <!-- 3. НАПРАВЛЕНИЯ -->
+      <!-- 2. НАПРАВЛЕНИЯ -->
       <section class="sec">
         <div class="sec-h">
           <h2>Что вы хотели бы продавать</h2>
@@ -306,7 +290,7 @@ footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);
         </div>
       </section>
 
-      <!-- 4. ФОРМАТ -->
+      <!-- 3. ФОРМАТ -->
       <section class="sec">
         <div class="sec-h">
           <h2>Выберите формат работы</h2>
@@ -323,7 +307,7 @@ footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);
         <div class="hint" id="hSrc"></div>
       </section>
 
-      <!-- 5. КОМАНДА -->
+      <!-- 4. КОМАНДА -->
       <section class="sec">
         <div class="sec-h">
           <h2>Количество человек в команде</h2>
@@ -408,11 +392,8 @@ var DIRS = [
   {chk:6500, com:0.090, tm:2.30},
   {chk:2000, com:0.095, tm:1.00}
 ];
-var LVL = {
-  "new":{conv:0.08, comK:0.90},
-  "mid":{conv:0.10, comK:1.00},
-  "pro":{conv:0.14, comK:1.20}
-};
+/* уровень не выбирается: считаем по среднему агенту — покупает каждый 10-й */
+var CONV = 0.10;
 
 /* ---------- ОДОМЕТР ---------- */
 var odoBox = document.getElementById('odo'), cols = [], lastLen = -1;
@@ -447,7 +428,6 @@ function plural(n,a,b,c){
 function calc(){
   var hours = +document.getElementById('hours').value;
   var days  = +document.getElementById('days').value;
-  var lvl   = LVL[document.querySelector('[name=lvl]:checked').value];
   var dir   = DIRS[+document.querySelector('[name=dir]:checked').value];
   var src   = document.querySelector('[name=src]:checked').value;
   var isAgency = (src === 'agency');
@@ -456,8 +436,8 @@ function calc(){
   document.getElementById('oAsst').classList.toggle('disabled', isAgency);
   document.getElementById('oNoAsst').classList.toggle('disabled', isAgency);
 
-  var conv = lvl.conv;
-  var comm = Math.min(0.14, dir.com * lvl.comK);
+  var conv = CONV;
+  var comm = dir.com;
 
   var tLead = isAgency ? 0.30 : 0.35;
   var tDeal = 0.5;
